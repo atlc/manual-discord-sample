@@ -1,12 +1,14 @@
 import { Message } from "discord.js";
 import db from "../../db";
 
-export default async function good_score(message: Message) {
-    const score = message.content.replace("!films >", "").replace(" ", "");
+export default async function search(message: Message) {
+    const title = message.content.replace("!films title", "").trim();
 
     db.films
-        .gt(score)
+        .byTitle(title)
         .then(async (films) => {
+            if (!films.length) return await message.reply(`No film was found matching that title`);
+
             const titles = films.map((film) => `${film.title}: ${film.rt_score}`).join("\n");
             await message.reply(titles);
         })
